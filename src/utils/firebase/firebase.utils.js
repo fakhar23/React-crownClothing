@@ -9,7 +9,16 @@ import {
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  writeBatch,
+  query,
+  getDocs,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD0Zc04N4htHhMEYa0Y3Jm9I1yhuUp27N0",
@@ -35,6 +44,34 @@ export const signInWithGoogleRedirect = () =>
   signInWithRedirect(auth, googleProvider);
 
 export const db = getFirestore();
+
+export const addCollectionAndDocument = async (collectionKey, obectsToAdd) => {
+  const collectionRef = collection(db, collectionKey);
+  // we are using writebath method of firebase, which aloows us to do certain tasks in a signle batch. if anyone fails,everything is reverted back
+  const batch = writeBatch(db);
+  obectsToAdd.forEach((object) => {
+    // creating new doc with object.title as key
+    const docRef = doc(collectionRef, object.title.toLowerCase());
+    // writing to previously created doc
+    batch.set(docRef, object);
+  });
+  await batch.commit();
+  console.log("addCollectionAndDocument successfully ran");
+};
+
+export const getCategoriesAndDocuments = async () => {
+  const collectionRef = collection(db, "categories");
+  const q = query(collectionRef);
+
+  const querySnapshot = await getDocs(q);
+  const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
+    const { title, items } = docSnapshot.data();
+    acc[title.toLowerCase()] = items;
+    // we have to return tota/acc in reduce
+    return acc;
+  }, {});
+  return categoryMap;
+};
 
 export const createUserDocumentFromAuth = async (
   userAuth,
