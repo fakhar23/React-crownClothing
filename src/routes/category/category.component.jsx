@@ -14,13 +14,16 @@ const Category = () => {
     console.log("categoriesMap[category]: ", categoriesMap[category]);
   }, [category, categoriesMap]);
   return (
-    <div className="category-container">
-      {/* products && is used because products are obtainef from async call and at first load there is no products so at first load there will be error of .map on undefined */}
-      {products &&
-        products.map((product) => (
-          <ProductCard product={product} key={product.id} />
-        ))}
-    </div>
+    <>
+      <h2 className="category-title">{category}</h2>
+      <div className="category-container">
+        {/* products && is used because products are obtainef from async call and at first load there is no products so at first load there will be error of .map on undefined */}
+        {products &&
+          products.map((product) => (
+            <ProductCard product={product} key={product.id} />
+          ))}
+      </div>
+    </>
   );
 };
 
