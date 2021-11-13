@@ -3,7 +3,12 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useContext, useState, useEffect } from "react";
 import ProductCard from "../../components/product-card/product-card.component";
-import { selectCategoriesMap } from "../../store/catrgories/category.selector";
+import Spinner from "../../components/spinner/spinner.component";
+
+import {
+  selectCategoriesMap,
+  selectCategoriesIsLoading,
+} from "../../store/catrgories/category.selector";
 
 import "./category.style.scss";
 
@@ -14,6 +19,8 @@ const Category = () => {
 
   const categoriesMap = useSelector(selectCategoriesMap);
 
+  const isLoading = useSelector(selectCategoriesIsLoading);
+
   const [products, setProducts] = useState(categoriesMap[category]);
   useEffect(() => {
     setProducts(categoriesMap[category]);
@@ -22,13 +29,17 @@ const Category = () => {
   return (
     <>
       <h2 className="category-title">{category}</h2>
-      <div className="category-container">
-        {/* products && is used because products are obtainef from async call and at first load there is no products so at first load there will be error of .map on undefined */}
-        {products &&
-          products.map((product) => (
-            <ProductCard product={product} key={product.id} />
-          ))}
-      </div>
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <div className="category-container">
+          {/* products && is used because products are obtainef from async call and at first load there is no products so at first load there will be error of .map on undefined */}
+          {products &&
+            products.map((product) => (
+              <ProductCard product={product} key={product.id} />
+            ))}
+        </div>
+      )}
     </>
   );
 };
